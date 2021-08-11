@@ -4,7 +4,7 @@ const {setHeaders, setAgent} = require("../lib/options");
 const type = require("../util/types");
 
 // Responsible for applying proxy
-const requestHandler = async (request, proxy, overrides = {}) => {
+const requestHandler = async (request, proxy, proxyStringTwo, secondTry, overrides = {}) => {
     // Reject non http(s) URI schemes
     if (!request.url().startsWith("http") && !request.url().startsWith("https")) {
         request.continue(); return;
@@ -16,7 +16,7 @@ const requestHandler = async (request, proxy, overrides = {}) => {
         method: overrides.method || request.method(),
         body: overrides.postData || request.postData(),
         headers: overrides.headers || setHeaders(request),
-        agent: setAgent(proxy),
+        agent: secondTry && proxyStringTwo ? setAgent(proxyStringTwo) : setAgent(proxy),
         responseType: "buffer",
         maxRedirects: 15,
         throwHttpErrors: false,
@@ -32,11 +32,16 @@ const requestHandler = async (request, proxy, overrides = {}) => {
             await cookieHandler.setCookies(setCookieHeader);
             response.headers["set-cookie"] = undefined;
         }
-        await request.respond({
-            status: response.statusCode,
-            headers: response.headers,
-            body: response.body
-        });
+        if (!secondTry && proxyStringTwo && !(response.statusCode >= 200 && response.statusCode < 300)) {
+            await requestHandler(request, proxy, proxyStringTwo, true, overrides);
+        }
+        else {
+            await request.respond({
+                status: response.statusCode,
+                headers: response.headers,
+                body: response.body
+            });
+        }
     } catch (error) {
         await request.abort();
     }
@@ -58,7 +63,7 @@ const removeRequestListener = (page, listenerName) => {
 };
 
 // Calls this if request object passed
-const proxyPerRequest = async (request, data) => {
+const proxyPerRequest = async (request, data, proxyStringTwo) => {
     let proxy, overrides;
     // Separate proxy and overrides
     if (type(data) === "object") {
@@ -69,7 +74,7 @@ const proxyPerRequest = async (request, data) => {
         }
     } else {proxy = data}
     // Skip request if proxy omitted
-    if (proxy) {await requestHandler(request, proxy, overrides)}
+    if (proxy) {await requestHandler(request, proxy, proxyStringTwo, false, overrides)}
     else {request.continue(overrides)}
 };
 
@@ -79,17 +84,17 @@ const proxyPerPage = async (page, proxy) => {
     const listener = "$ppp_request_listener";
     removeRequestListener(page, listener);
     const f = {[listener]: async (request) => {
-        await requestHandler(request, proxy);
+        await requestHandler(request, proxy, null, false);
     }};
     if (proxy) {page.on("request", f[listener])}
     else {await page.setRequestInterception(false)}
 };
 
 // Main function
-const useProxy = async (target, data) => {
+const useProxy = async (target, data, proxyStringTwo) => {
     const targetType = target.constructor.name;
     if (targetType === "HTTPRequest") {
-        await proxyPerRequest(target, data);
+        await proxyPerRequest(target, data, proxyStringTwo);
     } else if (targetType === "Page") {
         await proxyPerPage(target, data);
     }
