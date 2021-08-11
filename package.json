@@ -1,7 +1,7 @@
 {
   "name": "puppeteer-page-proxy-abowcut",
   "description": "Additional Node.js module to use with 'puppeteer' for setting proxies per page basis. Altered by abowcut",
-  "version": "1.2.8",
+  "version": "1.2.14",
   "author": "Cuadrix: alterred by abowcut",
   "homepage": "https://github.com/abowcut/puppeteer-page-proxy",
   "main": "./src/index.js",

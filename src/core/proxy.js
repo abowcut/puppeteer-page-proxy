@@ -32,7 +32,7 @@ const requestHandler = async (request, proxy, proxyStringTwo, secondTry, overrid
             await cookieHandler.setCookies(setCookieHeader);
             response.headers["set-cookie"] = undefined;
         }
-        if (!secondTry && proxyStringTwo && !(response.statusCode >= 200 && response.statusCode < 300)) {
+        if (!secondTry && proxyStringTwo && response.statusCode >= 400) {
             await requestHandler(request, proxy, proxyStringTwo, true, overrides);
         }
         else {
