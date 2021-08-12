@@ -1,4 +1,4 @@
-# puppeteer-page-proxy <img src="https://i.ibb.co/kQrN9QJ/puppeteer-page-proxy-logo.png" align="right" width="150" height="150">
+# puppeteer-page-proxy-abowcut <img src="https://i.ibb.co/kQrN9QJ/puppeteer-page-proxy-logo.png" align="right" width="150" height="150">
 Additional Node.js module to use with **[puppeteer](https://www.npmjs.com/package/puppeteer)** for setting proxies per page basis.
 Additional changes made to the original library to allow retrying a 4xx/5xx response with a second proxy.
 
@@ -41,7 +41,7 @@ See [httpRequest.continue](https://github.com/puppeteer/puppeteer/blob/main/docs
 ## Usage
 #### Importing:
 ```js
-const useProxy = require('puppeteer-page-proxy');
+const useProxy = require('puppeteer-page-proxy-abowcut');
 ```
 
 #### Proxy per page:
