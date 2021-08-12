@@ -1,5 +1,6 @@
 # puppeteer-page-proxy <img src="https://i.ibb.co/kQrN9QJ/puppeteer-page-proxy-logo.png" align="right" width="150" height="150">
 Additional Node.js module to use with **[puppeteer](https://www.npmjs.com/package/puppeteer)** for setting proxies per page basis.
+Additional changes made to the original library to allow retrying a 4xx/5xx response with a second proxy.
 
 Forwards intercepted requests from the browser to Node.js where it handles the request then returns the response to the browser, changing the proxy as a result.
 
@@ -12,7 +13,7 @@ Forwards intercepted requests from the browser to Node.js where it handles the r
 
 ## Installation
 ```
-npm i puppeteer-page-proxy
+npm i puppeteer-page-proxy-abowcut
 ```
 ## API
 #### PageProxy(pageOrReq, proxy)
@@ -23,7 +24,7 @@ npm i puppeteer-page-proxy
   * In the case of [proxy per request](https://github.com/Cuadrix/puppeteer-page-proxy#proxy-per-request), this can be an object with optional properties for overriding requests:\
 `url`, `method`, `postData`, `headers`\
 See [httpRequest.continue](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#httprequestcontinueoverrides) for more info about the above properties.
-  
+
 #### PageProxy.lookup(page[, lookupService, isJSON, timeout])
 
 - `page` <[object](https://developer.mozilla.org/en-US/docs/Glossary/Object)> 'Page' object to execute the request on.
@@ -36,7 +37,7 @@ See [httpRequest.continue](https://github.com/puppeteer/puppeteer/blob/main/docs
 - returns: <[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)> Promise which resolves to the response of the lookup request.
 
 **NOTE:** By default this method expects a response in [JSON](https://en.wikipedia.org/wiki/JSON#Example) format and [JSON.parse](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse)'s it to a usable javascript object. To disable this functionality, set `isJSON` to `false`.
-    
+
 ## Usage
 #### Importing:
 ```js
@@ -101,7 +102,7 @@ const proxy = 'https://user:pass@host:port';
 // 1. Waits until done, 'then' continues
 const data = await useProxy.lookup(page1);
     console.log(data.ip);
-    
+
 // 2. Executes and 'comes back' once done
 useProxy.lookup(page2).then(data => {
     console.log(data.ip);
